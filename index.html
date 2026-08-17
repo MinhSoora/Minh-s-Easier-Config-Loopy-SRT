@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Minh's Easier Config Loopy SRT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#12181f;
+  --ink-2:#1c2530;
+  --paper:#f3f4f0;
+  --surface:#ffffff;
+  --line:#dfe1da;
+  --line-strong:#c7cabf;
+  --text:#171b1f;
+  --muted:#5d6470;
+  --accent:#2f6fed;
+  --accent-ink:#0f3f9e;
+  --accent-soft:#e8effe;
+  --ok:#188a5c;
+  --ok-soft:#e4f5ec;
+  --fail:#c8402f;
+  --fail-soft:#fbe9e6;
+  --warn:#b5720f;
+  --warn-soft:#faf0dd;
+  --radius:10px;
+  --font-display:"IBM Plex Sans",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:14px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--accent-soft);color:var(--accent-ink)}
+a{color:var(--accent-ink)}
+
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* ---------- layout shell ---------- */
+.shell{
+  display:grid;
+  grid-template-columns:220px 1fr 340px;
+  min-height:100vh;
+}
+.topbar{
+  grid-column:1 / -1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:14px 22px;
+  background:var(--ink);
+  color:#f4f5f2;
+  position:sticky;
+  top:0;
+  z-index:40;
+}
+.brand{display:flex;align-items:baseline;gap:10px;min-width:0}
+.brand-mark{
+  font-family:var(--font-mono);
+  font-weight:700;
+  font-size:13px;
+  letter-spacing:.02em;
+  background:var(--accent);
+  color:#fff;
+  padding:4px 7px;
+  border-radius:5px;
+  flex:none;
+}
+.brand-name{
+  font-family:var(--font-display);
+  font-weight:600;
+  font-size:15px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.brand-name small{
+  display:block;
+  font-family:var(--font-mono);
+  font-weight:400;
+  font-size:11px;
+  color:#a7adb8;
+  letter-spacing:.02em;
+}
+.topbar-actions{display:flex;gap:8px;flex:none}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:9px 14px;
+  border-radius:7px;
+  border:1px solid transparent;
+  font-size:13px;
+  font-weight:600;
+  font-family:var(--font-mono);
+  letter-spacing:.01em;
+  transition:background .12s ease, border-color .12s ease, transform .06s ease;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#255fd1}
+.btn-ghost{background:transparent;border-color:#3a4451;color:#e7e9ec}
+.btn-ghost:hover{border-color:#5c6675;background:#1c2530}
+.btn-line{background:var(--surface);border-color:var(--line-strong);color:var(--text)}
+.btn-line:hover{border-color:var(--accent);color:var(--accent-ink)}
+.btn-sm{padding:6px 10px;font-size:12px}
+
+/* ---------- sidebar ---------- */
+.sidebar{
+  background:var(--ink-2);
+  border-right:1px solid #0a0e13;
+  padding:16px 10px 24px;
+  position:sticky;
+  top:53px;
+  height:calc(100vh - 53px);
+  overflow-y:auto;
+}
+.side-group-label{
+  font-family:var(--font-mono);
+  font-size:10.5px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#7d8794;
+  padding:14px 12px 6px;
+}
+.side-group-label:first-child{padding-top:4px}
+.side-link{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  text-align:left;
+  padding:9px 12px;
+  border-radius:7px;
+  color:#c6cbd3;
+  background:transparent;
+  border:none;
+  font-size:13.5px;
+  margin-bottom:2px;
+}
+.side-link .dot{
+  width:6px;height:6px;border-radius:50%;
+  background:#4a5261;flex:none;
+}
+.side-link:hover{background:#232e3b;color:#f2f3f4}
+.side-link.active{background:var(--accent);color:#fff}
+.side-link.active .dot{background:#fff}
+.side-link .badge-req{
+  margin-left:auto;
+  font-family:var(--font-mono);
+  font-size:9.5px;
+  color:#8b93a0;
+  background:#0f151c;
+  border:1px solid #2a3340;
+  padding:1px 5px;
+  border-radius:4px;
+}
+.side-link.active .badge-req{color:#dfe8ff;background:#1f57c9;border-color:#1f57c9}
+
+/* ---------- main ---------- */
+main{padding:26px 28px 80px;min-width:0}
+.panel{display:none}
+.panel.active{display:block;animation:rise .18s ease}
+@keyframes rise{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+.panel-head{margin-bottom:20px;max-width:640px}
+.panel-eyebrow{
+  font-family:var(--font-mono);
+  font-size:11px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--accent-ink);
+  margin:0 0 6px;
+}
+.panel-head h1{
+  font-family:var(--font-display);
+  font-size:23px;
+  margin:0 0 8px;
+  font-weight:600;
+  letter-spacing:-.01em;
+}
+.panel-head p{margin:0;color:var(--muted);font-size:13.5px}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:20px 22px;
+  margin-bottom:16px;
+}
+.card-title{
+  font-family:var(--font-mono);
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  color:var(--text);
+  margin:0 0 4px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.card-title .n{color:var(--accent-ink)}
+.card-sub{color:var(--muted);font-size:12.5px;margin:0 0 16px}
+
+.field-row{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:16px 20px;
+}
+.field-row.single{grid-template-columns:1fr}
+.field{margin-bottom:14px}
+.field label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:12.5px;
+  font-weight:600;
+  margin-bottom:5px;
+  color:var(--text);
+}
+.field label .key{
+  font-family:var(--font-mono);
+  font-weight:400;
+  font-size:10.5px;
+  color:var(--muted);
+  background:var(--paper);
+  border:1px solid var(--line);
+  padding:1px 5px;
+  border-radius:4px;
+}
+.field .help{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.45}
+.field .help b{color:var(--text);font-weight:600}
+
+input[type=text],input[type=number],input[type=password],select,textarea{
+  width:100%;
+  padding:8px 10px;
+  border:1px solid var(--line-strong);
+  border-radius:6px;
+  background:var(--surface);
+  color:var(--text);
+  font-size:13px;
+  font-family:var(--font-mono);
+}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 16px) 15px,calc(100% - 11px) 15px;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:30px}
+
+.pw-wrap{position:relative}
+.pw-wrap input{padding-right:60px}
+.pw-toggle{
+  position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  font-family:var(--font-mono);font-size:10.5px;font-weight:600;
+  border:1px solid var(--line-strong);background:var(--paper);
+  padding:4px 7px;border-radius:5px;color:var(--muted);
+}
+
+/* toggle switch */
+.switch-row{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
+  padding:12px 0;border-top:1px solid var(--line);
+}
+.switch-row:first-of-type{border-top:none;padding-top:2px}
+.switch-copy{min-width:0}
+.switch-copy .t{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.switch-copy .d{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.45}
+.switch{
+  flex:none;position:relative;width:38px;height:22px;border-radius:20px;
+  background:#d3d6cf;border:1px solid var(--line-strong);
+  transition:background .15s ease;
+}
+.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.switch .knob{
+  position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s ease;
+}
+.switch.on{background:var(--accent);border-color:var(--accent)}
+.switch.on .knob{transform:translateX(16px)}
+
+.notice{
+  display:flex;gap:10px;
+  border:1px solid var(--line);
+  background:var(--paper);
+  border-radius:8px;
+  padding:12px 14px;
+  font-size:12.5px;
+  color:var(--text);
+  margin-bottom:16px;
+}
+.notice.warn{background:var(--warn-soft);border-color:#eccf94}
+.notice.ok{background:var(--ok-soft);border-color:#a9d9c3}
+.notice .mark{font-family:var(--font-mono);font-weight:700;flex:none}
+.notice.warn .mark{color:var(--warn)}
+.notice.ok .mark{color:var(--ok)}
+
+.stream-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--font-mono);font-size:10.5px;font-weight:600;letter-spacing:.03em;
+  padding:2px 7px;border-radius:5px;border:1px solid var(--line-strong);color:var(--muted);
+}
+
+.disabled-block{opacity:.4;filter:grayscale(.3);pointer-events:none}
+
+/* guide panel */
+.steps{counter-reset:step;margin:0;padding:0;list-style:none}
+.steps li{
+  counter-increment:step;
+  display:grid;grid-template-columns:30px 1fr;gap:14px;
+  padding:14px 0;border-top:1px solid var(--line);
+}
+.steps li:first-child{border-top:none}
+.steps li::before{
+  content:counter(step,decimal-leading-zero);
+  font-family:var(--font-mono);font-weight:600;font-size:12px;color:var(--accent-ink);
+  background:var(--accent-soft);width:30px;height:30px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+}
+.steps h3{margin:2px 0 4px;font-size:13.5px;font-family:var(--font-display)}
+.steps p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.55}
+.steps code{
+  background:var(--paper);border:1px solid var(--line);
+  padding:1px 5px;border-radius:4px;font-family:var(--font-mono);font-size:11.5px;color:var(--text);
+}
+.qa{border-top:1px solid var(--line);padding:14px 0}
+.qa:first-of-type{border-top:none}
+.qa h4{margin:0 0 5px;font-size:13px;font-family:var(--font-display)}
+.qa p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.55}
+
+/* ---------- preview column ---------- */
+.preview{
+  border-left:1px solid var(--line);
+  background:#0d1218;
+  position:sticky;
+  top:53px;
+  height:calc(100vh - 53px);
+  display:flex;
+  flex-direction:column;
+}
+.preview-head{
+  padding:16px 18px 12px;
+  border-bottom:1px solid #232b34;
+}
+.preview-head .t{
+  font-family:var(--font-mono);color:#e7e9ec;font-size:12px;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.preview-head .file{
+  font-family:var(--font-mono);color:#7d8794;font-size:11px;margin-top:5px;
+}
+.preview-actions{display:flex;gap:8px;padding:12px 18px;border-bottom:1px solid #232b34}
+.preview-body{
+  flex:1;overflow:auto;padding:14px 18px 24px;
+}
+.preview-body pre{
+  margin:0;font-family:var(--font-mono);font-size:11.5px;line-height:1.65;color:#d7dde4;
+  white-space:pre-wrap;word-break:break-word;
+}
+.preview-body .ini-h{color:#7fb2ff}
+.preview-body .ini-k{color:#c9cfd8}
+.preview-body .ini-v{color:#8fe3b0}
+.preview-body .ini-c{color:#5a6472}
+
+.copy-toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(12px);
+  background:var(--ink);color:#fff;font-family:var(--font-mono);font-size:12.5px;
+  padding:10px 16px;border-radius:8px;opacity:0;pointer-events:none;transition:all .18s ease;
+  z-index:200;border:1px solid var(--accent);
+}
+.copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* mobile drawer trigger */
+.mobile-preview-btn{display:none}
+
+@media (max-width: 980px){
+  .shell{grid-template-columns:190px 1fr}
+  .preview{
+    grid-column:1 / -1;
+    position:fixed;inset:auto 0 0 0;height:72vh;top:auto;
+    transform:translateY(100%);transition:transform .22s ease;
+    z-index:100;border-top:1px solid #232b34;border-left:none;
+    box-shadow:0 -12px 30px rgba(0,0,0,.35);
+  }
+  .preview.open{transform:translateY(0)}
+  .mobile-preview-btn{
+    display:flex;position:fixed;right:16px;bottom:16px;z-index:90;
+    align-items:center;gap:8px;
+  }
+}
+@media (max-width: 700px){
+  .shell{grid-template-columns:1fr}
+  .sidebar{
+    position:sticky;top:53px;height:auto;
+    display:flex;overflow-x:auto;gap:4px;padding:10px;
+    border-right:none;border-bottom:1px solid #0a0e13;
+  }
+  .side-group-label{display:none}
+  .side-link{flex:none;white-space:nowrap;margin-bottom:0}
+  .side-link .badge-req{display:none}
+  main{padding:18px 16px 90px}
+  .field-row{grid-template-columns:1fr}
+  .brand-name small{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">SRT</span>
+      <div class="brand-name">Minh's Easier Config Loopy SRT
+        <small>trình tạo config.ini trực quan cho Loopy SRT Stats Monitor</small>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost btn-sm" id="btnReset" type="button">Đặt lại</button>
+      <button class="btn btn-primary btn-sm" id="btnDownloadTop" type="button">Tải config.ini</button>
+    </div>
+  </header>
+
+  <nav class="sidebar" id="sidebar">
+    <div class="side-group-label">Cơ bản</div>
+    <button class="side-link active" data-panel="p-config"><span class="dot"></span>Cấu hình chung<span class="badge-req">bắt buộc</span></button>
+    <button class="side-link" data-panel="p-ws"><span class="dot"></span>WebSocket &amp; OBS<span class="badge-req">bắt buộc</span></button>
+
+    <div class="side-group-label">Nguồn phát (chọn 1+)</div>
+    <button class="side-link" data-panel="p-sls"><span class="dot"></span>SRT Live Server</button>
+    <button class="side-link" data-panel="p-rtmp"><span class="dot"></span>NGINX RTMP</button>
+    <button class="side-link" data-panel="p-restreamer"><span class="dot"></span>Datarhei Restreamer</button>
+
+    <div class="side-group-label">Tuỳ chọn</div>
+    <button class="side-link" data-panel="p-multicam"><span class="dot"></span>Đa camera</button>
+    <button class="side-link" data-panel="p-lbr"><span class="dot"></span>Bitrate thấp</button>
+    <button class="side-link" data-panel="p-advanced"><span class="dot"></span>Nâng cao</button>
+
+    <div class="side-group-label">Trợ giúp</div>
+    <button class="side-link" data-panel="p-guide"><span class="dot"></span>Hướng dẫn cài đặt</button>
+  </nav>
+
+  <main>
+
+    <!-- ===================== PANEL: CONFIG CHUNG ===================== -->
+    <section class="panel active" id="p-config">
+      <div class="panel-head">
+        <p class="panel-eyebrow">[config] · bắt buộc</p>
+        <h1>Cấu hình chung</h1>
+        <p>Các scene OBS và độ trễ chuyển cảnh. Đây là phần cốt lõi — Loopy đọc các tên scene này để biết chuyển sang đâu khi tín hiệu SRT/RTMP mất hoặc phục hồi.</p>
+      </div>
+
+      <div class="notice warn">
+        <span class="mark">!</span>
+        <span>Tên scene phải khớp <b>chính xác</b> (phân biệt hoa/thường) với tên scene trong OBS Studio của bạn, nếu không Loopy sẽ không chuyển được cảnh.</span>
+      </div>
+
+      <div class="card">
+        <p class="card-title"><span class="n">01</span> Scene chính</p>
+        <p class="card-sub">Ba trạng thái cốt lõi của một buổi live: đang chờ, đang ổn định, và mất kết nối.</p>
+        <div class="field-row">
+          <div class="field">
+            <label>Scene khi có tín hiệu <span class="key">SceneOK</span></label>
+            <input type="text" id="SceneOK" value="Main">
+            <p class="help">Scene hiển thị cho khán giả khi luồng SRT/RTMP đang ổn định.</p>
+          </div>
+          <div class="field">
+            <label>Scene khi mất tín hiệu <span class="key">SceneFail</span></label>
+            <input type="text" id="SceneFail" value="FAIL">
+            <p class="help">Scene "xin lỗi vì mất kết nối" — nên đặt một Media/VLC Source dự phòng ở đây.</p>
+          </div>
+          <div class="field">
+            <label>Scene chờ khởi động <span class="key">SceneIntro</span></label>
+            <input type="text" id="SceneIntro" value="Intro">
+            <p class="help">Hiện khi mở Loopy trước khi có tín hiệu đầu tiên. Đặt <code>none</code> nếu không dùng.</p>
+          </div>
+          <div class="field">
+            <label>Scene bỏ qua giám sát <span class="key">SceneBypass</span></label>
+            <input type="text" id="SceneBypass" value="none">
+            <p class="help">Khi scene này đang bật trong OBS, Loopy tạm ngưng theo dõi (ví dụ màn chờ, quảng cáo). Đặt <code>none</code> để tắt.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title"><span class="n">02</span> Độ trễ &amp; nguồn media</p>
+        <div class="field-row">
+          <div class="field">
+            <label>Độ trễ trước khi báo mất kết nối (giây) <span class="key">StreamFailDelay</span></label>
+            <input type="number" id="StreamFailDelay" value="8" min="1" max="60">
+            <p class="help">Số giây chờ trước khi Loopy coi là "mất kết nối" và chuyển sang SceneFail. Giá trị thấp phản ứng nhanh nhưng dễ nhấp nháy khi mạng chập chờn; 8 giây là mốc an toàn phổ biến.</p>
+          </div>
+          <div></div>
+          <div class="field">
+            <label>Tên Media Source — luồng 1 <span class="key">MediaSource1</span></label>
+            <input type="text" id="MediaSource1" value="Media Source">
+            <p class="help">Đúng tên nguồn SRT/RTMP bạn đặt trong OBS cho camera/luồng thứ nhất.</p>
+          </div>
+          <div class="field">
+            <label>Tên Media Source — luồng 2 <span class="key">MediaSource2</span></label>
+            <input type="text" id="MediaSource2" value="Media Source 2">
+            <p class="help">Chỉ cần thiết nếu bạn dùng chế độ đa camera bên dưới.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title"><span class="n">03</span> Ứng dụng</p>
+        <div class="switch-row">
+          <div class="switch-copy">
+            <div class="t">Tự kiểm tra bản cập nhật <span class="key">CheckUpdateOnStartup</span></div>
+            <div class="d">Loopy kiểm tra phiên bản mới trên GitHub mỗi khi khởi động.</div>
+          </div>
+          <label class="switch on" data-bool="CheckUpdateOnStartup"><input type="checkbox" checked><span class="knob"></span></label>
+        </div>
+        <div class="field-row single">
+          <div class="field">
+            <label>Giao diện <span class="key">ColorTheme</span></label>
+            <select id="ColorTheme">
+              <option value="Default" selected>Default</option>
+              <option value="Dark">Dark</option>
+              <option value="Light">Light</option>
+            </select>
+            <p class="help">Chỉ ảnh hưởng màu giao diện cửa sổ Loopy, không ảnh hưởng logic chuyển scene. Để <code>Default</code> nếu không chắc.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PANEL: WEBSOCKET ===================== -->
+    <section class="panel" id="p-ws">
+      <div class="panel-head">
+        <p class="panel-eyebrow">[config] + [obs-websocket-http] · bắt buộc</p>
+        <h1>Kết nối WebSocket &amp; OBS</h1>
+        <p>Đây là "đường dây" để Loopy điều khiển OBS. Chọn đúng kiểu kết nối theo phiên bản OBS Websocket bạn đang cài, nếu không Loopy sẽ không chuyển được scene dù mọi thứ khác đúng.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-title"><span class="n">01</span> Kiểu kết nối</p>
+        <div class="field-row single">
+          <div class="field">
+            <label>Phương thức <span class="key">WebSocketConnection</span></label>
+            <select id="WebSocketConnection">
+              <option value="obs-websocket-http" selected>obs-websocket-http — OBS Websocket 5.x (OBS 28+, khuyên dùng)</option>
+              <option value="obs-websocket-js">obs-websocket-js — OBS Websocket 4.9.1 (OBS cũ / tương thích ngược)</option>
+            </select>
+            <p class="help" id="wsConnHelp"><b>obs-websocket-http</b> đi kèm sẵn khi cài Loopy bằng trình cài đặt Windows, không cần Node.js, cổng mặc định của OBS Websocket 5.x là <code>4455</code>. Nếu bạn vẫn dùng OBS cũ với plugin obs-websocket 4.9.1, chuyển sang <b>obs-websocket-js</b> (cổng mặc định <code>4444</code>) — cách này cần cài Node.js và chạy <code>install.cmd</code>.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title"><span class="n">02</span> Địa chỉ &amp; mật khẩu OBS Websocket</p>
+        <p class="card-sub">Lấy trong OBS: <b>Tools → WebSocket Server Settings</b>. Nhớ bật "Enable WebSocket server" và đặt mật khẩu.</p>
+        <div class="field-row">
+          <div class="field">
+            <label>Địa chỉ:cổng <span class="key">WebSocketAddress</span></label>
+            <input type="text" id="WebSocketAddress" value="127.0.0.1:4455">
+            <p class="help">Máy chạy OBS và máy chạy Loopy thường là cùng một máy, nên để <code>127.0.0.1</code>. Đổi cổng thành <code>4444</code> nếu bạn chọn obs-websocket-js ở trên.</p>
+          </div>
+          <div class="field">
+            <label>Mật khẩu WebSocket <span class="key">WebSocketPassword</span></label>
+            <div class="pw-wrap">
+              <input type="password" id="WebSocketPassword" value="PassWS">
+              <button type="button" class="pw-toggle" data-target="WebSocketPassword">HIỆN</button>
+            </div>
+            <p class="help">Phải khớp tuyệt đối với mật khẩu đặt trong OBS, kể cả khoảng trắng.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="httpBlock">
+        <p class="card-title"><span class="n">03</span> obs-websocket-http — máy chủ cầu nối</p>
+        <p class="card-sub">Phần này chỉ áp dụng khi bạn chọn phương thức <b>obs-websocket-http</b> ở trên. Đây là các thiết lập của chính tiến trình cầu nối chạy nền, thường để mặc định.</p>
+        <div class="field-row">
+          <div class="field">
+            <label>Địa chỉ lắng nghe <span class="key">HTTPBindAddress</span></label>
+            <input type="text" id="HTTPBindAddress" value="127.0.0.1">
+            <p class="help">Để mặc định trừ khi bạn cần điều khiển Loopy từ máy khác trong mạng LAN.</p>
+          </div>
+          <div class="field">
+            <label>Cổng lắng nghe <span class="key">HTTPBindPort</span></label>
+            <input type="number" id="HTTPBindPort" value="4456">
+            <p class="help">Không được trùng với cổng OBS Websocket ở trên (4455).</p>
+          </div>
+          <div class="field">
+            <label>Khoá xác thực <span class="key">HTTPAuthKey</span></label>
+            <input type="text" id="HTTPAuthKey" value="">
+            <p class="help">Có thể để trống nếu chỉ dùng nội bộ máy bạn.</p>
+          </div>
+          <div class="field">
+            <label>Kiểu giao tiếp <span class="key">HTTPCommunication</span></label>
+            <input type="text" id="HTTPCommunication" value="native">
+            <p class="help">Giữ nguyên <code>native</code> trừ khi tài liệu của obs-websocket-http yêu cầu khác.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PANEL: SLS ===================== -->
+    <section class="panel" id="p-sls">
+      <div class="panel-head">
+        <p class="panel-eyebrow">[srt-live-server]</p>
+        <h1>SRT Live Server (SLS)</h1>
+        <p>Dùng khi bạn tự dựng máy chủ SRT Live Server để nhận luồng SRT trước khi đưa vào OBS. Loopy đọc trang thống kê (stats) của SLS để biết bitrate hiện tại.</p>
+      </div>
+
+      <div class="notice">
+        <span class="mark">i</span>
+        <span>Chỉ bật mục này nếu bạn thực sự chạy SLS. Nếu bạn dùng OBS nhận SRT trực tiếp (Media Source kiểu SRT) mà không qua SLS, hãy tắt cả hai công tắc bên dưới.</span>
+      </div>
+
+      <div class="card">
+        <div class="switch-row" style="border-top:none;padding-top:2px">
+          <div class="switch-copy">
+            <div class="t"><span class="stream-tag">LUỒNG 1</span> Bật giám sát SLS <span class="key">SLS1Enabled</span></div>
+            <div class="d">Theo dõi bitrate và trạng thái kết nối của luồng thứ nhất qua SLS.</div>
+          </div>
+          <label class="switch" data-bool="SLS1Enabled"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+        <div class="field-row" id="sls1Fields">
+          <div class="field"><label>Địa chỉ IP máy chủ <span class="key">SLSServerIP1</span></label><input type="text" id="SLSServerIP1" value="127.0.0.1"><p class="help">IP nơi SLS đang chạy — thường là <code>127.0.0.1</code> nếu cùng máy với OBS.</p></div>
+          <div class="field"><label>Cổng trang thống kê <span class="key">SLSServerPort1</span></label><input type="number" id="SLSServerPort1" value="8181"><p class="help">Cổng HTTP hiển thị stats của SLS, theo <code>sls.conf</code> của bạn.</p></div>
+          <div class="field"><label>Đường dẫn thống kê <span class="key">SLSServerStats1</span></label><input type="text" id="SLSServerStats1" value="stats"><p class="help">Thường là <code>stats</code> theo mặc định của SLS.</p></div>
+          <div class="field"><label>Publisher path <span class="key">SLSServerPublisher1</span></label><input type="text" id="SLSServerPublisher1" value="publish/live/stream1"><p class="help">Đường dẫn publish bạn cấu hình trong bộ phát SRT (vd. Larix Broadcaster), phải khớp với <code>sls.conf</code>.</p></div>
+          <div class="field"><label>Keep-alive <span class="key">SLSServerKeepAlive1</span></label><input type="text" id="SLSServerKeepAlive1" value="Default"><p class="help">Để <code>Default</code> nếu không chắc — điều chỉnh độ nhạy khi phát hiện mất kết nối tạm thời.</p></div>
+          <div class="field"><label>Ngưỡng bitrate thấp (kbps) <span class="key">SLSBitrateLow1</span></label><input type="number" id="SLSBitrateLow1" value="800"><p class="help">Bitrate xuống dưới mức này sẽ kích hoạt scene "bitrate thấp" (nếu bật ở mục Bitrate thấp).</p></div>
+          <div class="field"><label>Ngưỡng bitrate mất kết nối (kbps) <span class="key">SLSBitrateFail1</span></label><input type="number" id="SLSBitrateFail1" value="400"><p class="help">Bitrate xuống dưới mức này được tính là mất kết nối, chuyển sang SceneFail.</p></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="switch-row" style="border-top:none;padding-top:2px">
+          <div class="switch-copy">
+            <div class="t"><span class="stream-tag">LUỒNG 2</span> Bật giám sát SLS <span class="key">SLS2Enabled</span></div>
+            <div class="d">Chỉ cần thiết nếu bạn dùng chế độ đa camera với luồng SRT thứ hai qua SLS.</div>
+          </div>
+          <label class="switch" data-bool="SLS2Enabled"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+        <div class="field-row" id="sls2Fields">
+          <div class="field"><label>Địa chỉ IP máy chủ <span class="key">SLSServerIP2</span></label><input type="text" id="SLSServerIP2" value="127.0.0.1"></div>
+          <div class="field"><label>Cổng trang thống kê <span class="key">SLSServerPort2</span></label><input type="number" id="SLSServerPort2" value="8181"></div>
+          <div class="field"><label>Đường dẫn thống kê <span class="key">SLSServerStats2</span></label><input type="text" id="SLSServerStats2" value="stats"></div>
+          <div class="field"><label>Publisher path <span class="key">SLSServerPublisher2</span></label><input type="text" id="SLSServerPublisher2" value="publish/live/stream2"></div>
+          <div class="field"><label>Keep-alive <span class="key">SLSServerKeepAlive2</span></label><input type="text" id="SLSServerKeepAlive2" value="Default"></div>
+          <div class="field"><label>Ngưỡng bitrate thấp (kbps) <span class="key">SLSBitrateLow2</span></label><input type="number" id="SLSBitrateLow2" value="800"></div>
+          <div class="field"><label>Ngưỡng bitrate mất kết nối (kbps) <span class="key">SLSBitrateFail2</span></label><input type="number" id="SLSBitrateFail2" value="400"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PANEL: RTMP ===================== -->
+    <section class="panel" id="p-rtmp">
+      <div class="panel-head">
+        <p class="panel-eyebrow">[nginx-rtmp-module]</p>
+        <h1>NGINX RTMP module</h1>
+        <p>Dùng khi bạn tự dựng máy chủ NGINX có module RTMP để nhận luồng RTMP làm trạm trung chuyển trước OBS.</p>
+      </div>
+
+      <div class="card">
+        <div class="switch-row" style="border-top:none;padding-top:2px">
+          <div class="switch-copy">
+            <div class="t"><span class="stream-tag">LUỒNG 1</span> Bật giám sát RTMP <span class="key">RTMP1Enabled</span></div>
+            <div class="d">Theo dõi bitrate luồng thứ nhất qua trang stat của NGINX.</div>
+          </div>
+          <label class="switch on" data-bool="RTMP1Enabled"><input type="checkbox" checked><span class="knob"></span></label>
+        </div>
+        <div class="field-row" id="rtmp1Fields">
+          <div class="field"><label>Địa chỉ IP máy chủ <span class="key">RTMPServerIP</span></label><input type="text" id="RTMPServerIP" value="127.0.0.1"><p class="help">Chung cho cả hai luồng — NGINX quản lý nhiều publisher trên cùng một máy chủ.</p></div>
+          <div class="field"><label>Cổng máy chủ <span class="key">RTMPServerPort</span></label><input type="number" id="RTMPServerPort" value="80"><p class="help">Cổng HTTP của NGINX, theo <code>nginx.conf</code>.</p></div>
+          <div class="field"><label>Đường dẫn trang stat <span class="key">RTMPServerStats</span></label><input type="text" id="RTMPServerStats" value="stat"><p class="help">Thường là <code>stat</code> theo cấu hình mẫu của module rtmp.</p></div>
+          <div class="field"><label>Keep-alive <span class="key">RTMPServerKeepAlive</span></label><input type="text" id="RTMPServerKeepAlive" value="Default"></div>
+          <div class="field"><label>Tên publisher — luồng 1 <span class="key">RTMPServerPublisher1</span></label><input type="text" id="RTMPServerPublisher1" value="streamout"><p class="help">Stream key bạn đặt trong phần mềm phát (OBS/Larix) khi đẩy RTMP lên NGINX.</p></div>
+          <div class="field"><label>Ngưỡng bitrate thấp (kbps) <span class="key">RTMPBitrateLow1</span></label><input type="number" id="RTMPBitrateLow1" value="1000"></div>
+          <div class="field"><label>Ngưỡng bitrate mất kết nối (kbps) <span class="key">RTMPBitrateFail1</span></label><input type="number" id="RTMPBitrateFail1" value="400"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="switch-row" style="border-top:none;padding-top:2px">
+          <div class="switch-copy">
+            <div class="t"><span class="stream-tag">LUỒNG 2</span> Bật giám sát RTMP <span class="key">RTMP2Enabled</span></div>
+            <div class="d">Chỉ cần thiết nếu bạn dùng chế độ đa camera với luồng RTMP thứ hai.</div>
+          </div>
+          <label class="switch" data-bool="RTMP2Enabled"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+        <div class="field-row" id="rtmp2Fields">
+          <div class="field"><label>Tên publisher — luồng 2 <span class="key">RTMPServerPublisher2</span></label><input type="text" id="RTMPServerPublisher2" value="none"></div>
+          <div class="field"><label>Ngưỡng bitrate thấp (kbps) <span class="key">RTMPBitrateLow2</span></label><input type="number" id="RTMPBitrateLow2" value="1000"></div>
+          <div class="field"><label>Ngưỡng bitrate mất kết nối (kbps) <span class="key">RTMPBitrateFail2</span></label><input type="number" id="RTMPBitrateFail2" value="400"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PANEL: RESTREAMER ===================== -->
+    <section class="panel" id="p-restreamer">
+      <div class="panel-head">
+        <p class="panel-eyebrow">[datarhei-restreamer]</p>
+        <h1>Datarhei Restreamer</h1>
+        <p>Dùng khi bạn nhận luồng qua một máy chủ Datarhei Restreamer (thường triển khai bằng Docker) thay vì SLS hoặc NGINX.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-title"><span class="n">01</span> Xác thực máy chủ</p>
+        <div class="field-row">
+          <div class="field"><label>Tên đăng nhập <span class="key">RestreamerUsername</span></label><input type="text" id="RestreamerUsername" value="admin"></div>
+          <div class="field">
+            <label>Mật khẩu <span class="key">RestreamerPassword</span></label>
+            <div class="pw-wrap">
+              <input type="password" id="RestreamerPassword" value="password">
+              <button type="button" class="pw-toggle" data-target="RestreamerPassword">HIỆN</button>
+            </div>
+          </div>
+          <div class="field"><label>Địa chỉ IP máy chủ <span class="key">RestreamerServerIP</span></label><input type="text" id="RestreamerServerIP" value="127.0.0.1"></div>
+          <div class="field"><label>Cổng máy chủ <span class="key">RestreamerServerPort</span></label><input type="number" id="RestreamerServerPort" value="8080"><p class="help">Cổng quản trị web của Restreamer, mặc định <code>8080</code>.</p></div>
+          <div class="field"><label>Giao thức theo dõi <span class="key">RestreamerStats</span></label><input type="text" id="RestreamerStats" value="srt,rtmp"><p class="help">Danh sách giao thức cách nhau dấu phẩy mà Restreamer đang nhận, thường để mặc định.</p></div>
+          <div class="field"><label>Keep-alive <span class="key">RestreamerServerKeepAlive</span></label><input type="text" id="RestreamerServerKeepAlive" value="Default"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="switch-row" style="border-top:none;padding-top:2px">
+          <div class="switch-copy">
+            <div class="t"><span class="stream-tag">LUỒNG 1</span> Bật giám sát Restreamer <span class="key">Restreamer1Enabled</span></div>
+          </div>
+          <label class="switch" data-bool="Restreamer1Enabled"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+        <div class="field-row" id="rs1Fields">
+          <div class="field"><label>Process ID <span class="key">RestreamerID1</span></label><input type="text" id="RestreamerID1" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"><p class="help">ID tiến trình lấy từ giao diện quản trị Restreamer, ứng với luồng đầu vào của bạn.</p></div>
+          <div class="field"><label>Ngưỡng bitrate thấp (kbps) <span class="key">RestreamerBitrateLow1</span></label><input type="number" id="RestreamerBitrateLow1" value="800"></div>
+          <div class="field"><label>Ngưỡng bitrate mất kết nối (kbps) <span class="key">RestreamerBitrateFail1</span></label><input type="number" id="RestreamerBitrateFail1" value="400"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="switch-row" style="border-top:none;padding-top:2px">
+          <div class="switch-copy">
+            <div class="t"><span class="stream-tag">LUỒNG 2</span> Bật giám sát Restreamer <span class="key">Restreamer2Enabled</span></div>
+          </div>
+          <label class="switch" data-bool="Restreamer2Enabled"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+        <div class="field-row" id="rs2Fields">
+          <div class="field"><label>Process ID <span class="key">RestreamerID2</span></label><input type="text" id="RestreamerID2" value="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></div>
+          <div class="field"><label>Ngưỡng bitrate thấp (kbps) <span class="key">RestreamerBitrateLow2</span></label><input type="number" id="RestreamerBitrateLow2" value="800"></div>
+          <div class="field"><label>Ngưỡng bitrate mất kết nối (kbps) <span class="key">RestreamerBitrateFail2</span></label><input type="number" id="RestreamerBitrateFail2" value="400"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PANEL: MULTICAM ===================== -->
+    <section class="panel" id="p-multicam">
+      <div class="panel-head">
+        <p class="panel-eyebrow">[multi-camera-switch]</p>
+        <h1>Chế độ đa camera</h1>
+        <p>Cho kịch bản hai luồng độc lập (ví dụ camera chính + camera phụ), Loopy tự chuyển giữa scene "chỉ luồng 1", "chỉ luồng 2" hoặc "cả hai" tuỳ vào luồng nào đang sống.</p>
+      </div>
+
+      <div class="card">
+        <div class="switch-row" style="border-top:none;padding-top:2px">
+          <div class="switch-copy">
+            <div class="t">Bật chế độ đa camera <span class="key">MultiCameraSwitch</span></div>
+            <div class="d">Khi tắt, Loopy chỉ dùng SceneOK / SceneFail đơn giản ở mục Cấu hình chung và bỏ qua toàn bộ phần này.</div>
+          </div>
+          <label class="switch" data-bool="MultiCameraSwitch"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+      </div>
+
+      <div class="card" id="multicamFields">
+        <p class="card-title"><span class="n">01</span> Scene theo tổ hợp luồng</p>
+        <div class="field-row">
+          <div class="field"><label>Chỉ luồng 1 sống <span class="key">TitleScene1</span></label><input type="text" id="TitleScene1" value="Main"></div>
+          <div class="field"><label>Chỉ luồng 2 sống <span class="key">TitleScene2</span></label><input type="text" id="TitleScene2" value="Main 2"></div>
+          <div class="field"><label>Cả hai luồng sống <span class="key">TitleScene12</span></label><input type="text" id="TitleScene12" value="Main 1+2"></div>
+        </div>
+        <p class="card-title" style="margin-top:8px"><span class="n">02</span> Khi phục hồi kết nối</p>
+        <div class="switch-row">
+          <div class="switch-copy">
+            <div class="t">Quay lại scene trước đó <span class="key">ReturnPreviousScene</span></div>
+            <div class="d">Thay vì luôn quay về scene mặc định, Loopy nhớ scene bạn đang dùng trước khi mất kết nối và quay lại đúng scene đó.</div>
+          </div>
+          <label class="switch" data-bool="ReturnPreviousScene"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-copy">
+            <div class="t">Ghi nhớ qua các lần khởi động <span class="key">ReturnPreviousSceneRemember</span></div>
+            <div class="d">Lưu lại scene trước đó ngay cả khi bạn tắt và mở lại Loopy.</div>
+          </div>
+          <label class="switch" data-bool="ReturnPreviousSceneRemember"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PANEL: LBR ===================== -->
+    <section class="panel" id="p-lbr">
+      <div class="panel-head">
+        <p class="panel-eyebrow">[low-bitrate]</p>
+        <h1>Scene bitrate thấp</h1>
+        <p>Một trạng thái "cảnh báo sớm" trước khi mất kết nối hẳn — hữu ích để báo khán giả biết bạn sắp rớt sóng, hoặc tự động hạ chất lượng hiển thị.</p>
+      </div>
+
+      <div class="card">
+        <div class="switch-row" style="border-top:none;padding-top:2px">
+          <div class="switch-copy">
+            <div class="t">Bật scene bitrate thấp <span class="key">SceneLBREnabled</span></div>
+            <div class="d">Khi bitrate luồng xuống dưới ngưỡng "thấp" đặt ở tab nguồn phát tương ứng, Loopy chuyển sang scene này trước khi rớt hẳn.</div>
+          </div>
+          <label class="switch" data-bool="SceneLBREnabled"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+        <div class="field-row" id="lbrFields">
+          <div class="field">
+            <label>Độ trễ trước khi vào bitrate thấp (giây) <span class="key">SceneLBRDelay</span></label>
+            <input type="number" id="SceneLBRDelay" value="10">
+            <p class="help">Tránh nhấp nháy khi bitrate dao động quanh ngưỡng trong thời gian ngắn.</p>
+          </div>
+          <div class="field">
+            <label>Tắt LBR riêng cho luồng 2 <span class="key">Scene2LBRDisabled</span></label>
+            <select id="Scene2LBRDisabled">
+              <option value="false" selected>Không — áp dụng LBR cho cả hai luồng</option>
+              <option value="true">Có — luồng 2 bỏ qua bitrate thấp</option>
+            </select>
+            <p class="help">Hữu ích khi luồng 2 là nguồn ổn định (vd. camera cố định) không cần cảnh báo bitrate.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PANEL: ADVANCED ===================== -->
+    <section class="panel" id="p-advanced">
+      <div class="panel-head">
+        <p class="panel-eyebrow">[advanced] + [undocumented]</p>
+        <h1>Tuỳ chọn nâng cao</h1>
+        <p>Phần lớn người dùng có thể để nguyên mặc định. Chỉnh khi bạn cần ghi log, xuất trạng thái ra chat, hoặc dùng RIST thay vì SRT.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-title"><span class="n">01</span> Ghi log &amp; xuất trạng thái</p>
+        <div class="switch-row" style="border-top:none;padding-top:2px">
+          <div class="switch-copy">
+            <div class="t">Ghi log kết nối <span class="key">ConnectionsLog</span></div>
+            <div class="d">Lưu lịch sử kết nối vào <code>Documents\Loopy SRT Monitor\Temp</code>, hữu ích khi cần soát lỗi sau buổi live.</div>
+          </div>
+          <label class="switch" data-bool="ConnectionsLog"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-copy">
+            <div class="t">Xuất trạng thái ra file <span class="key">FileStatusOutput</span></div>
+            <div class="d">Ghi trạng thái hiện tại ra một file text, dùng để hiển thị trong chat (vd. script AdiIRC) hoặc overlay ngoài OBS.</div>
+          </div>
+          <label class="switch" data-bool="FileStatusOutput"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title"><span class="n">02</span> RIST</p>
+        <div class="switch-row" style="border-top:none;padding-top:2px">
+          <div class="switch-copy">
+            <div class="t"><span class="stream-tag">LUỒNG 1</span> Chế độ phát hiện lỗi RIST <span class="key">RISTFailMode1</span></div>
+            <div class="d">Bật nếu luồng 1 dùng giao thức RIST thay vì SRT — cách OBS báo cáo trạng thái RIST khác với SRT nên cần chế độ riêng.</div>
+          </div>
+          <label class="switch" data-bool="RISTFailMode1"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-copy">
+            <div class="t"><span class="stream-tag">LUỒNG 2</span> Chế độ phát hiện lỗi RIST <span class="key">RISTFailMode2</span></div>
+          </div>
+          <label class="switch" data-bool="RISTFailMode2"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title"><span class="n">03</span> Cửa sổ &amp; hiển thị</p>
+        <div class="switch-row" style="border-top:none;padding-top:2px">
+          <div class="switch-copy">
+            <div class="t">Cho phép thay đổi kích thước cửa sổ <span class="key">AllowResize</span></div>
+          </div>
+          <label class="switch" data-bool="AllowResize"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-copy">
+            <div class="t">Hiện bitrate với số thập phân <span class="key">KbpsPrecision</span></div>
+            <div class="d">Hiển thị dạng "2453.6 kbps" thay vì làm tròn "2454 kbps".</div>
+          </div>
+          <label class="switch" data-bool="KbpsPrecision"><input type="checkbox"><span class="knob"></span></label>
+        </div>
+        <div class="switch-row">
+          <div class="switch-copy">
+            <div class="t">Tự mở trang obs-websocket-http <span class="key">HTTPAutoOpen</span></div>
+            <div class="d">Mở sẵn bảng điều khiển của cầu nối HTTP mỗi khi Loopy khởi động.</div>
+          </div>
+          <label class="switch on" data-bool="HTTPAutoOpen"><input type="checkbox" checked><span class="knob"></span></label>
+        </div>
+        <div class="field-row" style="margin-top:10px">
+          <div class="field">
+            <label>Vị trí cửa sổ X <span class="key">xWindowPosition</span></label>
+            <input type="number" id="xWindowPosition" value="-1">
+            <p class="help">Để <code>-1</code> để Loopy tự căn giữa màn hình.</p>
+          </div>
+          <div class="field">
+            <label>Vị trí cửa sổ Y <span class="key">yWindowPosition</span></label>
+            <input type="number" id="yWindowPosition" value="-1">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PANEL: GUIDE ===================== -->
+    <section class="panel" id="p-guide">
+      <div class="panel-head">
+        <p class="panel-eyebrow">Đọc trước khi live</p>
+        <h1>Hướng dẫn cài đặt Loopy SRT</h1>
+        <p>Tóm tắt quy trình chuẩn theo tài liệu chính thức của loopy750/SRT-Stats-Monitor, đã lược bớt phần không cần thiết cho người mới.</p>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Quy trình cài đặt</p>
+        <ol class="steps">
+          <li>
+            <div>
+              <h3>Cài OBS Studio và bật OBS WebSocket</h3>
+              <p>Trong OBS: <code>Tools → WebSocket Server Settings</code>, bật "Enable WebSocket server" và đặt mật khẩu — chính là giá trị bạn điền ở tab WebSocket &amp; OBS.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Cài Loopy SRT Stats Monitor</h3>
+              <p>Tải bản mới nhất từ trang <code>releases</code> của loopy750/SRT-Stats-Monitor. Nếu dùng phương thức <code>obs-websocket-http</code>, trình cài Windows đã kèm sẵn, không cần cài Node.js.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Tạo file config.ini</h3>
+              <p>Điền các tab bên trái, sau đó bấm <b>Tải config.ini</b> và đặt file vào <code>Documents\Loopy SRT Monitor\config.ini</code>, thay thế file mẫu <code>config.default.ini</code>. Loopy chỉ đọc file này, không tự ghi lại.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Cấu hình nguồn SRT trong OBS</h3>
+              <p>Thêm Media Source kiểu SRT với đúng tên đã điền ở <code>MediaSource1</code>/<code>MediaSource2</code>. Tắt "Restart playback when source becomes active" và đặt Reconnect Delay là 1 giây — đây là khuyến nghị chính thức để tránh xung đột với Loopy.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Chuẩn bị scene dự phòng</h3>
+              <p>Ở scene <code>SceneFail</code>, thêm nguồn VLC Video Source phát một video chờ, bật "Loop Playlist" và "Pause when not visible, unpause when visible" để tiết kiệm tài nguyên khi không hiển thị.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Mở cổng nếu phát từ ngoài mạng nhà</h3>
+              <p>Nếu điện thoại/bộ phát SRT ở ngoài đường mà máy chạy OBS ở nhà, cần mở port forwarding trên router cho cổng SRT và cổng WebSocket đang dùng. Nếu ISP dùng CG-NAT, port forwarding sẽ không hoạt động — cần liên hệ nhà mạng để xin IP công khai hoặc dùng dịch vụ IP động như No-IP.</p>
+            </div>
+          </li>
+          <li>
+            <div>
+              <h3>Chạy thử trước khi lên sóng thật</h3>
+              <p>Bật bộ phát, xác nhận Loopy hiện đúng trạng thái "sống", sau đó tắt nguồn phát để kiểm tra Loopy có chuyển đúng sang <code>SceneFail</code> sau đúng số giây <code>StreamFailDelay</code> hay không.</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Chọn nguồn phát nào?</p>
+        <div class="field-row">
+          <div class="field">
+            <label style="font-weight:600">OBS nhận SRT trực tiếp</label>
+            <p class="help">Đơn giản nhất — không cần bật SLS/NGINX/Restreamer, chỉ cần đúng tên Media Source ở tab Cấu hình chung.</p>
+          </div>
+          <div class="field">
+            <label style="font-weight:600">SRT Live Server (SLS)</label>
+            <p class="help">Khi bạn tự dựng máy chủ trung chuyển SRT riêng, cần giám sát bitrate ở tầng máy chủ trước khi vào OBS.</p>
+          </div>
+          <div class="field">
+            <label style="font-weight:600">NGINX RTMP module</label>
+            <p class="help">Khi bộ phát của bạn chỉ hỗ trợ RTMP (không phải SRT), NGINX đóng vai trò máy chủ nhận RTMP trung gian.</p>
+          </div>
+          <div class="field">
+            <label style="font-weight:600">Datarhei Restreamer</label>
+            <p class="help">Giải pháp đóng gói sẵn bằng Docker, phù hợp nếu bạn muốn một máy chủ trung chuyển dễ triển khai mà không tự cấu hình NGINX/SLS.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title">Câu hỏi thường gặp</p>
+        <div class="qa">
+          <h4>obs-websocket-http hay obs-websocket-js?</h4>
+          <p>Nếu bạn dùng OBS 28 trở lên (có OBS Websocket 5.x tích hợp sẵn), chọn <code>obs-websocket-http</code> — không cần cài Node.js. Chỉ chuyển sang <code>obs-websocket-js</code> nếu bạn bắt buộc phải dùng OBS Websocket 4.9.1 vì lý do tương thích với công cụ khác.</p>
+        </div>
+        <div class="qa">
+          <h4>Vì sao Loopy không chuyển scene dù OBS đã kết nối?</h4>
+          <p>Nguyên nhân phổ biến nhất: tên scene trong config.ini không khớp tuyệt đối với tên scene trong OBS (kể cả khoảng trắng, hoa/thường), hoặc cổng WebSocket khai báo không khớp với cổng thực tế OBS đang lắng nghe.</p>
+        </div>
+        <div class="qa">
+          <h4>Đặt StreamFailDelay bao nhiêu là hợp lý?</h4>
+          <p>8 giây là mốc mặc định được nhiều streamer IRL dùng. Mạng di động chập chờn có thể cần 10–12 giây để tránh nhấp nháy scene liên tục; mạng dây ổn định có thể hạ xuống 4–6 giây để phản ứng nhanh hơn.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <aside class="preview" id="previewPanel">
+    <div class="preview-head">
+      <div class="t">
+        <span>Xem trước config.ini</span>
+        <button class="btn-line btn btn-sm" id="btnCloseMobile" type="button" style="display:none">Đóng</button>
+      </div>
+      <div class="file">Documents\Loopy SRT Monitor\config.ini</div>
+    </div>
+    <div class="preview-actions">
+      <button class="btn btn-primary btn-sm" id="btnDownload" type="button" style="flex:1">Tải file</button>
+      <button class="btn btn-line btn-sm" id="btnCopy" type="button" style="flex:1">Sao chép</button>
+    </div>
+    <div class="preview-body"><pre id="iniOutput"></pre></div>
+  </aside>
+</div>
+
+<button class="btn btn-primary mobile-preview-btn" id="btnOpenMobile" type="button">Xem config.ini</button>
+<div class="copy-toast" id="copyToast">Đã sao chép vào clipboard</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- navigation ---------- */
+  var links = document.querySelectorAll(".side-link");
+  var panels = document.querySelectorAll(".panel");
+  links.forEach(function(link){
+    link.addEventListener("click", function(){
+      links.forEach(function(l){ l.classList.remove("active"); });
+      panels.forEach(function(p){ p.classList.remove("active"); });
+      link.classList.add("active");
+      document.getElementById(link.dataset.panel).classList.add("active");
+      document.querySelector("main").scrollTo({top:0});
+      window.scrollTo({top:0, behavior:"instant"});
+    });
+  });
+
+  /* ---------- toggle switches ---------- */
+  var switches = document.querySelectorAll(".switch");
+  switches.forEach(function(sw){
+    var cb = sw.querySelector("input");
+    sw.addEventListener("click", function(e){
+      if(e.target !== cb){ cb.checked = !cb.checked; }
+      sw.classList.toggle("on", cb.checked);
+      applyConditionals();
+      generate();
+    });
+  });
+
+  /* ---------- password reveal ---------- */
+  document.querySelectorAll(".pw-toggle").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var input = document.getElementById(btn.dataset.target);
+      if(input.type === "password"){ input.type = "text"; btn.textContent = "ẨN"; }
+      else { input.type = "password"; btn.textContent = "HIỆN"; }
+    });
+  });
+
+  /* ---------- conditional field dimming ---------- */
+  function boolOf(id){
+    var el = document.querySelector('[data-bool="'+id+'"] input');
+    return el ? el.checked : false;
+  }
+  function dim(blockId, on){
+    var el = document.getElementById(blockId);
+    if(!el) return;
+    el.classList.toggle("disabled-block", !on);
+  }
+  function applyConditionals(){
+    dim("sls1Fields", boolOf("SLS1Enabled"));
+    dim("sls2Fields", boolOf("SLS2Enabled"));
+    dim("rtmp1Fields", boolOf("RTMP1Enabled"));
+    dim("rtmp2Fields", boolOf("RTMP2Enabled"));
+    dim("rs1Fields", boolOf("Restreamer1Enabled"));
+    dim("rs2Fields", boolOf("Restreamer2Enabled"));
+    dim("multicamFields", boolOf("MultiCameraSwitch"));
+    dim("lbrFields", boolOf("SceneLBREnabled"));
+
+    var isHttp = document.getElementById("WebSocketConnection").value === "obs-websocket-http";
+    document.getElementById("httpBlock").classList.toggle("disabled-block", !isHttp);
+  }
+
+  document.getElementById("WebSocketConnection").addEventListener("change", function(){
+    var help = document.getElementById("wsConnHelp");
+    var addr = document.getElementById("WebSocketAddress");
+    if(this.value === "obs-websocket-http"){
+      if(addr.value === "127.0.0.1:4444") addr.value = "127.0.0.1:4455";
+    } else {
+      if(addr.value === "127.0.0.1:4455") addr.value = "127.0.0.1:4444";
+    }
+    applyConditionals();
+    generate();
+  });
+
+  /* ---------- gather all inputs ---------- */
+  var allInputs = document.querySelectorAll("main input, main select");
+  allInputs.forEach(function(el){
+    var evt = (el.tagName === "SELECT") ? "change" : "input";
+    el.addEventListener(evt, generate);
+  });
+
+  function v(id){
+    var el = document.getElementById(id);
+    return el ? el.value : "";
+  }
+  function b(id){
+    return boolOf(id) ? "true" : "false";
+  }
+
+  /* ---------- ini builder ---------- */
+  function line(key, val){
+    return escapeHtml(key) + "=" + escapeHtml(String(val));
+  }
+  function escapeHtml(s){
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function buildSection(title, rows){
+    var out = '<span class="ini-h">[' + title + ']</span>\n';
+    rows.forEach(function(r){
+      out += '<span class="ini-k">' + escapeHtml(r[0]) + '</span>=<span class="ini-v">' + escapeHtml(String(r[1])) + '</span>\n';
+    });
+    return out;
+  }
+
+  function generate(){
+    applyConditionals();
+    var out = "";
+    out += '<span class="ini-c">;\n; Loopy SRT Stats Monitor configuration file\n; ------------------------------------------\n;\n; Tạo bởi Minh\'s Easier Config Loopy SRT\n; https://github.com/loopy750/SRT-Stats-Monitor\n;</span>\n\n';
+
+    out += buildSection("config", [
+      ["xWindowPosition", v("xWindowPosition")],
+      ["yWindowPosition", v("yWindowPosition")],
+      ["StreamFailDelay", v("StreamFailDelay")],
+      ["SceneOK", v("SceneOK")],
+      ["SceneFail", v("SceneFail")],
+      ["SceneIntro", v("SceneIntro")],
+      ["SceneBypass", v("SceneBypass")],
+      ["MediaSource1", v("MediaSource1")],
+      ["MediaSource2", v("MediaSource2")],
+      ["WebSocketAddress", v("WebSocketAddress")],
+      ["WebSocketPassword", v("WebSocketPassword")],
+      ["WebSocketConnection", v("WebSocketConnection")],
+      ["CheckUpdateOnStartup", b("CheckUpdateOnStartup")],
+      ["ColorTheme", v("ColorTheme")],
+    ]) + "\n";
+
+    out += buildSection("multi-camera-switch", [
+      ["MultiCameraSwitch", b("MultiCameraSwitch")],
+      ["TitleScene1", v("TitleScene1")],
+      ["TitleScene2", v("TitleScene2")],
+      ["TitleScene12", v("TitleScene12")],
+      ["ReturnPreviousScene", b("ReturnPreviousScene")],
+      ["ReturnPreviousSceneRemember", b("ReturnPreviousSceneRemember")],
+    ]) + "\n";
+
+    out += buildSection("low-bitrate", [
+      ["SceneLBREnabled", b("SceneLBREnabled")],
+      ["SceneLBRDelay", v("SceneLBRDelay")],
+      ["Scene2LBRDisabled", v("Scene2LBRDisabled")],
+    ]) + "\n";
+
+    out += buildSection("obs-websocket-http", [
+      ["HTTPBindAddress", v("HTTPBindAddress")],
+      ["HTTPBindPort", v("HTTPBindPort")],
+      ["HTTPAuthKey", v("HTTPAuthKey")],
+      ["HTTPCommunication", v("HTTPCommunication")],
+    ]) + "\n";
+
+    out += buildSection("advanced", [
+      ["ConnectionsLog", b("ConnectionsLog")],
+      ["FileStatusOutput", b("FileStatusOutput")],
+      ["RISTFailMode1", b("RISTFailMode1")],
+      ["RISTFailMode2", b("RISTFailMode2")],
+      ["AllowResize", b("AllowResize")],
+    ]) + "\n";
+
+    out += buildSection("nginx-rtmp-module", [
+      ["RTMP1Enabled", b("RTMP1Enabled")],
+      ["RTMP2Enabled", b("RTMP2Enabled")],
+      ["RTMPServerIP", v("RTMPServerIP")],
+      ["RTMPServerPort", v("RTMPServerPort")],
+      ["RTMPServerStats", v("RTMPServerStats")],
+      ["RTMPServerKeepAlive", v("RTMPServerKeepAlive")],
+      ["RTMPServerPublisher1", v("RTMPServerPublisher1")],
+      ["RTMPServerPublisher2", v("RTMPServerPublisher2")],
+      ["RTMPBitrateLow1", v("RTMPBitrateLow1")],
+      ["RTMPBitrateLow2", v("RTMPBitrateLow2")],
+      ["RTMPBitrateFail1", v("RTMPBitrateFail1")],
+      ["RTMPBitrateFail2", v("RTMPBitrateFail2")],
+    ]) + "\n";
+
+    out += buildSection("srt-live-server", [
+      ["SLS1Enabled", b("SLS1Enabled")],
+      ["SLS2Enabled", b("SLS2Enabled")],
+      ["SLSServerIP1", v("SLSServerIP1")],
+      ["SLSServerIP2", v("SLSServerIP2")],
+      ["SLSServerPort1", v("SLSServerPort1")],
+      ["SLSServerPort2", v("SLSServerPort2")],
+      ["SLSServerStats1", v("SLSServerStats1")],
+      ["SLSServerStats2", v("SLSServerStats2")],
+      ["SLSServerPublisher1", v("SLSServerPublisher1")],
+      ["SLSServerPublisher2", v("SLSServerPublisher2")],
+      ["SLSServerKeepAlive1", v("SLSServerKeepAlive1")],
+      ["SLSServerKeepAlive2", v("SLSServerKeepAlive2")],
+      ["SLSBitrateLow1", v("SLSBitrateLow1")],
+      ["SLSBitrateLow2", v("SLSBitrateLow2")],
+      ["SLSBitrateFail1", v("SLSBitrateFail1")],
+      ["SLSBitrateFail2", v("SLSBitrateFail2")],
+    ]) + "\n";
+
+    out += buildSection("datarhei-restreamer", [
+      ["Restreamer1Enabled", b("Restreamer1Enabled")],
+      ["Restreamer2Enabled", b("Restreamer2Enabled")],
+      ["RestreamerUsername", v("RestreamerUsername")],
+      ["RestreamerPassword", v("RestreamerPassword")],
+      ["RestreamerServerIP", v("RestreamerServerIP")],
+      ["RestreamerServerPort", v("RestreamerServerPort")],
+      ["RestreamerStats", v("RestreamerStats")],
+      ["RestreamerServerKeepAlive", v("RestreamerServerKeepAlive")],
+      ["RestreamerID1", v("RestreamerID1")],
+      ["RestreamerID2", v("RestreamerID2")],
+      ["RestreamerBitrateLow1", v("RestreamerBitrateLow1")],
+      ["RestreamerBitrateLow2", v("RestreamerBitrateLow2")],
+      ["RestreamerBitrateFail1", v("RestreamerBitrateFail1")],
+      ["RestreamerBitrateFail2", v("RestreamerBitrateFail2")],
+    ]) + "\n";
+
+    out += buildSection("undocumented", [
+      ["KbpsPrecision", b("KbpsPrecision")],
+      ["HTTPAutoOpen", b("HTTPAutoOpen")],
+    ]) + "\n";
+
+    var wsMode = v("WebSocketConnection");
+    var wsHostPort = v("WebSocketAddress").split(":");
+    out += '<span class="ini-c">; obs-websocket-http đọc thêm khối [http] này nếu nằm cùng thư mục config.ini.\n; Chỉ áp dụng khi WebSocketConnection=obs-websocket-http ở trên.</span>\n';
+    out += buildSection("http", [
+      ["bind_to_address", v("HTTPBindAddress")],
+      ["bind_to_port", v("HTTPBindPort")],
+      ["cors_domains", "*"],
+      ["authentication_key", v("HTTPAuthKey")],
+    ]) + "\n";
+
+    out += '<span class="ini-c">; obs-websocket-js đọc khối [obsws] này nếu nằm cùng thư mục config.ini.\n; Chỉ áp dụng khi WebSocketConnection=obs-websocket-js ở trên.</span>\n';
+    out += buildSection("obsws", [
+      ["ws_url", "ws://" + (wsMode === "obs-websocket-js" ? v("WebSocketAddress") : (wsHostPort[0] || "127.0.0.1") + ":4444")],
+      ["ws_password", v("WebSocketPassword")],
+    ]);
+
+    document.getElementById("iniOutput").innerHTML = out;
+  }
+
+  function plainText(){
+    return document.getElementById("iniOutput").textContent;
+  }
+
+  /* ---------- download / copy ---------- */
+  function download(){
+    var blob = new Blob([plainText()], {type:"text/plain;charset=utf-8"});
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "config.ini";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+  function copy(){
+    var text = plainText();
+    var toast = document.getElementById("copyToast");
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      setTimeout(function(){ toast.classList.remove("show"); }, 1800);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){
+        showToast("Đã sao chép vào clipboard");
+      }).catch(function(){
+        showToast("Không sao chép được — hãy chọn và copy thủ công");
+      });
+    } else {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); showToast("Đã sao chép vào clipboard"); }
+      catch(e){ showToast("Không sao chép được — hãy chọn và copy thủ công"); }
+      document.body.removeChild(ta);
+    }
+  }
+
+  document.getElementById("btnDownload").addEventListener("click", download);
+  document.getElementById("btnDownloadTop").addEventListener("click", download);
+  document.getElementById("btnCopy").addEventListener("click", copy);
+
+  document.getElementById("btnReset").addEventListener("click", function(){
+    if(confirm("Đặt lại toàn bộ về giá trị mặc định?")) location.reload();
+  });
+
+  /* ---------- mobile preview drawer ---------- */
+  var previewPanel = document.getElementById("previewPanel");
+  var openBtn = document.getElementById("btnOpenMobile");
+  var closeBtn = document.getElementById("btnCloseMobile");
+  function isMobile(){ return window.innerWidth <= 980; }
+  function updateMobileUI(){
+    closeBtn.style.display = isMobile() ? "inline-flex" : "none";
+  }
+  openBtn.addEventListener("click", function(){ previewPanel.classList.add("open"); });
+  closeBtn.addEventListener("click", function(){ previewPanel.classList.remove("open"); });
+  window.addEventListener("resize", updateMobileUI);
+  updateMobileUI();
+
+  /* ---------- init ---------- */
+  applyConditionals();
+  generate();
+})();
+</script>
+</body>
+                                                                                                  </html>
